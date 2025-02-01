@@ -1,11 +1,16 @@
-from data_processing import read_sentiment_examples, build_vocab, bag_of_words
+from data_processing import read_sentiment_examples, build_vocab, bag_of_words, create_datasets
 from naive_bayes import NaiveBayes
 from logistic_regression import LogisticRegression
 from utils import evaluate_classification
 import torch
+import os
 
 
 def main():
+    # Create datasets if they don't exist from .parquet files
+    if not os.path.exists('data/train.txt'):
+        create_datasets()
+
     # Load training data
     train_examples = read_sentiment_examples("data/train.txt")
     print("Building vocabulary...")
@@ -16,6 +21,7 @@ def main():
     train_features = torch.stack(
         [bag_of_words(ex.words, vocab) for ex in train_examples]
     )
+
     train_labels = torch.tensor(
         [ex.label for ex in train_examples], dtype=torch.float32
     )
